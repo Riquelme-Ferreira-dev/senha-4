@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Poco X7 Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+:root{--red:#FF4C4C;--orange:#FF6B35}
+html,body{width:100%;height:100%;font-family:"Roboto",sans-serif;background:#000;overflow:hidden;touch-action:none}
+.phone{position:relative;overflow:hidden;background:#000}
+@media(min-width:480px){
+  body{display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a1a}
+  .phone{width:390px;height:844px;border-radius:52px;box-shadow:0 0 0 2px #333,0 0 0 4px #111,0 40px 100px rgba(0,0,0,.95)}
+  .sbtn{display:block}
+}
+@media(max-width:479px){
+  body{display:block;background:#000}
+  .phone{width:100vw;height:100vh;height:100dvh;border-radius:0}
+}
+.sbtn{position:absolute;background:#1c1c1c;border-radius:3px;display:none}
+.sbtn-pw{width:3px;height:68px;right:-3px;top:155px}
+.sbtn-vu{width:3px;height:50px;left:-3px;top:135px}
+.sbtn-vd{width:3px;height:50px;left:-3px;top:196px}
+.statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-start;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 22px 0;z-index:190;color:#fff;font-size:13px;font-weight:500}
+.sb-right{display:flex;align-items:center;gap:5px;font-size:12px}
+.bat{width:22px;height:11px;border:1.5px solid rgba(255,255,255,.7);border-radius:2.5px;position:relative;display:flex;align-items:center;padding:1.5px}
+.bat::after{content:"";position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:2px;height:5px;background:rgba(255,255,255,.7);border-radius:0 1px 1px 0}
+.bat-fill{width:31%;height:100%;background:var(--red);border-radius:1px}
+.screen{position:absolute;inset:0;transition:opacity .4s ease}
+.screen.hidden{opacity:0;pointer-events:none}
+.screen.active{opacity:1;pointer-events:all}
+
+/* LOCK */
+#lockScreen{background:linear-gradient(155deg,#0c0c18,#080810,#100810);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:max(44px,env(safe-area-inset-bottom,20px)+28px);cursor:pointer}
+#lockScreen::before{content:"";position:absolute;top:-60px;left:-40px;width:300px;height:300px;background:radial-gradient(circle,rgba(255,100,40,.16),transparent 70%);border-radius:50%;animation:blob 9s ease-in-out infinite}
+#lockScreen::after{content:"";position:absolute;bottom:200px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(70,50,200,.13),transparent 70%);border-radius:50%;animation:blob 12s ease-in-out infinite reverse}
+@keyframes blob{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.lock-clock{position:absolute;top:130px;text-align:center;z-index:10}
+.lock-time{font-size:80px;font-weight:300;color:#fff;letter-spacing:-3px;line-height:1}
+.lock-date{font-size:14px;color:rgba(255,255,255,.5);margin-top:8px}
+.swipe-hint{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;animation:pulse 2.5s ease-in-out infinite;margin-bottom:4px}
+@keyframes pulse{0%,100%{opacity:.4;transform:translateY(0)}50%{opacity:.85;transform:translateY(-4px)}}
+.swipe-chevron{display:flex;flex-direction:column;align-items:center;gap:2px}
+.swipe-chevron span{display:block;width:10px;height:10px;border-right:1.5px solid rgba(255,255,255,.35);border-top:1.5px solid rgba(255,255,255,.35);transform:rotate(-45deg)}
+.swipe-chevron span:nth-child(2){opacity:.55}
+.swipe-chevron span:nth-child(3){opacity:.28}
+.swipe-text{color:rgba(255,255,255,.4);font-size:12px;letter-spacing:1.5px}
+.fs-btn{display:none;position:absolute;bottom:max(100px,env(safe-area-inset-bottom)+80px);right:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;z-index:50}
+@media(max-width:479px){.fs-btn{display:block}}
+body.is-fullscreen .fs-btn{display:none!important}
+
+/* PIN */
+#pinScreen{background:linear-gradient(155deg,#0c0c18,#080810,#100810);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:max(60px,env(safe-area-inset-top)+40px) 0 max(40px,env(safe-area-inset-bottom)+20px)}
+.pin-title{color:rgba(255,255,255,.9);font-size:16px;z-index:10}
+.pin-dots{display:flex;gap:14px;z-index:10}
+.dot{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:transparent;transition:all .18s ease}
+.dot.filled{background:#fff;border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.4);transform:scale(1.1)}
+.dot.error{background:var(--red);border-color:var(--red);box-shadow:0 0 10px rgba(255,76,76,.5)}
+.pin-err{color:var(--red);font-size:13px;min-height:16px;text-align:center;z-index:10}
+.numpad{display:grid;grid-template-columns:repeat(3,84px);gap:12px;z-index:10}
+.num-btn{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:#fff;font-size:27px;font-weight:300;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .12s,transform .12s;font-family:"Roboto",sans-serif}
+.num-btn sub{font-size:9px;color:rgba(255,255,255,.38);letter-spacing:1.5px;margin-top:2px;font-weight:400}
+.num-btn:active{background:rgba(255,255,255,.14);transform:scale(.92)}
+.num-btn.ghost{background:transparent;border:none;font-size:13px;color:rgba(255,255,255,.55);font-weight:400}
+.num-btn.ghost:active{background:rgba(255,255,255,.08);transform:scale(.92)}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}35%{transform:translateX(8px)}55%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.shake{animation:shake .45s ease}
+
+/* HOME */
+#homeScreen{background:#000;overflow:hidden;display:flex;flex-direction:column}
+.home-topbar{flex-shrink:0;display:flex;align-items:center;padding:0 18px;gap:20px;border-bottom:1px solid rgba(255,255,255,.07);z-index:20;margin-top:54px}
+.h-tab{color:rgba(255,255,255,.45);font-size:15px;font-weight:500;padding:10px 2px;cursor:pointer;position:relative}
+.h-tab.on{color:var(--orange)}
+.h-tab.on::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--orange);border-radius:2px 2px 0 0}
+.h-tab-ico{margin-left:auto;color:rgba(255,255,255,.45);font-size:18px}
+
+/* PIN notification */
+.pin-card{position:absolute;top:108px;left:10px;right:10px;background:rgba(18,18,18,.97);border:1px solid rgba(255,107,53,.35);border-radius:14px;padding:10px 32px 10px 12px;z-index:50;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.6);opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .3s ease,transform .3s ease}
+.pin-card.show{opacity:1;pointer-events:all;transform:translateY(0)}
+.pc-app-icon{width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#c9956d}
+.pc-app-icon img{width:34px;height:34px;object-fit:cover;border-radius:10px}
+.pc-body{flex:1;min-width:0}
+.pc-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:1px}
+.pc-msg{font-size:12px;color:rgba(255,255,255,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-msg span{color:#FF9500;font-weight:600;letter-spacing:1px}
+.pc-time{font-size:11px;color:rgba(255,255,255,.3);flex-shrink:0;align-self:flex-start;margin-top:1px}
+.pc-close{position:absolute;top:6px;right:8px;color:rgba(255,255,255,.25);font-size:14px;cursor:pointer;padding:2px 4px}
+.pc-close:active{color:rgba(255,255,255,.8)}
+.pc-progress{position:absolute;bottom:0;left:0;height:2px;background:var(--orange);border-radius:0 0 14px 14px;width:100%;transform-origin:left}
+.pin-card.show .pc-progress{animation:shrink 4s linear forwards}
+@keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* App grid — scrollable, takes remaining space */
+.app-grid{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:14px 10px 0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px 0;
+  align-content:start;
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.app-grid::-webkit-scrollbar{display:none}
+
+/* App items */
+.app-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 2px;border-radius:14px;position:relative;transition:background .12s}
+.app-item:active{background:rgba(255,255,255,.07)}
+.aico{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#111}
+.aico img{width:100%;height:100%;object-fit:cover;border-radius:18px;display:block}
+.aname{color:rgba(255,255,255,.8);font-size:11px;text-align:center;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{position:absolute;top:5px;right:14px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:flex;align-items:center;justify-content:center;border:1.5px solid #000}
+
+/* Search bar — INSIDE grid as last row, spans all columns */
+.search-row{grid-column:1/-1;padding:10px 6px max(18px,env(safe-area-inset-bottom)+10px)}
+.home-search{height:50px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:28px;display:flex;align-items:center;padding:0 18px;gap:12px}
+.search-ico{color:rgba(255,255,255,.4);font-size:17px}
+.search-txt{color:rgba(255,255,255,.35);font-size:14px}
+
+.gesture{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:100px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;z-index:300}
+@keyframes homeIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:scale(1)}}
+#homeScreen.active{animation:homeIn .35s ease forwards}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="sbtn sbtn-pw"></div>
+  <div class="sbtn sbtn-vu"></div>
+  <div class="sbtn sbtn-vd"></div>
+  <div class="gesture"></div>
+  <div class="statusbar">
+    <span id="sbTime">23:08</span>
+    <div class="sb-right"><span>5G</span><div class="bat"><div class="bat-fill"></div></div><span style="font-size:11px;color:rgba(255,255,255,.7)">31</span></div>
+  </div>
+
+  <!-- LOCK -->
+  <div id="lockScreen" class="screen active" onclick="goToPin()">
+    <button class="fs-btn" onclick="event.stopPropagation();requestFS()">&#9974; Tela cheia</button>
+    <div class="lock-clock"><div class="lock-time" id="lockTime">--:--</div><div class="lock-date" id="lockDate">Carregando...</div></div>
+    <div class="swipe-hint">
+      <div class="swipe-chevron"><span></span><span></span><span></span></div>
+      <div class="swipe-text">DESLIZE PARA CIMA</div>
+    </div>
+  </div>
+
+  <!-- PIN -->
+  <div id="pinScreen" class="screen hidden">
+    <div class="pin-title">Digite sua senha</div>
+    <div class="pin-dots" id="pinDots">
+      <div class="dot" id="d0"></div><div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="np(event,'1')">1</button>
+      <button class="num-btn" onclick="np(event,'2')">2<sub>ABC</sub></button>
+      <button class="num-btn" onclick="np(event,'3')">3<sub>DEF</sub></button>
+      <button class="num-btn" onclick="np(event,'4')">4<sub>GHI</sub></button>
+      <button class="num-btn" onclick="np(event,'5')">5<sub>JKL</sub></button>
+      <button class="num-btn" onclick="np(event,'6')">6<sub>MNO</sub></button>
+      <button class="num-btn" onclick="np(event,'7')">7<sub>PQRS</sub></button>
+      <button class="num-btn" onclick="np(event,'8')">8<sub>TUV</sub></button>
+      <button class="num-btn" onclick="np(event,'9')">9<sub>WXYZ</sub></button>
+      <button class="num-btn ghost" onclick="goToLock()">&#8592; Voltar</button>
+      <button class="num-btn" onclick="np(event,'0')">0</button>
+      <button class="num-btn ghost" style="font-size:22px" onclick="del()">&#9003;</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="homeScreen" class="screen hidden">
+    <div class="pin-card" id="pinCard">
+      <div class="pc-close" onclick="hideCard()">&#10005;</div>
+      <div class="pc-app-icon"><img id="pcIcon" src="" alt=""></div>
+      <div class="pc-body">
+        <div class="pc-title">Claude</div>
+        <div class="pc-msg">&#128274; Senha: <span id="pcVal">------</span></div>
+      </div>
+      <div class="pc-time" id="pcTime">agora</div>
+      <div class="pc-progress" id="pcProgress"></div>
+    </div>
+    <div class="home-topbar">
+      <div class="h-tab on">Tudo</div>
+      <div class="h-tab">Comunicação</div>
+      <div class="h-tab">Entreten...</div>
+      <div class="h-tab-ico">&#8857;</div>
+    </div>
+    <div class="app-grid" id="appGrid"></div>
+  </div>
+</div>
+
+<script>
+const ICONS = {
+  claude: "imagens/claude.png",
+  whatsapp: "imagens/what.png",
+  instagram: "imagens/instagram.png",
+  tiktok: "imagens/tiktok.png",
+  acode: "imagens/acode.png",
+  agenda: "imagens/agenda.png",
+  agora: "imagens/agora.png",
+  aliexpress: "imagens/aliexprex.jpg",
+  amazonm: "imagens/amazommusic.png",
+  amazon: "imagens/amazon.png",
+  appmall: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImFtIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzZDNjNGRiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzlDMjdCMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjIiIGZpbGw9InVybCgjYW0pIi8+PHBhdGggZD0iTTUwIDI4IEw3MiA2OCBIMjggWiIgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iLjkiLz48cmVjdCB4PSI0MCIgeT0iNTUiIHdpZHRoPSIyMCIgaGVpZ2h0PSI0IiBmaWxsPSIjOUMyN0IwIi8+PC9zdmc+",
+  vault: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjNDNBMDQ3Ii8+PHJlY3QgeD0iMjYiIHk9IjM4IiB3aWR0aD0iNDgiIGhlaWdodD0iMzQiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIuMiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMzggMzggVjMyIFEzOCAyMiA1MCAyMiBRNjIgMjIgNjIgMzIgVjM4IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTUiIHI9IjciIGZpbGw9IndoaXRlIi8+PC9zdmc+",
+  booking: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMDAzNTgwIi8+PHRleHQgeD0iNTAiIHk9IjU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSI+Qm9va2luZzwvdGV4dD48dGV4dCB4PSI1MCIgeT0iNjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0iIzZFQzlGRiI+LmNvbTwvdGV4dD48L3N2Zz4=",
+  bradesco: "imagens/bradesco.png",
+  bussola: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMTk3NkQyIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMyIvPjxwb2x5Z29uIHBvaW50cz0iNTAsMzAgNTUsNTAgNTAsNDYgNDUsNTAiIGZpbGw9IiNGRjUyNTIiLz48cG9seWdvbiBwb2ludHM9IjUwLDcwIDU1LDUwIDUwLDU0IDQ1LDUwIiBmaWxsPSJ3aGl0ZSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjMiIGZpbGw9IndoaXRlIi8+PC9zdmc+",
+  calc: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjRTUzOTM1Ii8+PHJlY3QgeD0iMjYiIHk9IjI0IiB3aWR0aD0iNDgiIGhlaWdodD0iNTIiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIuMTUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjUwIiB5PSI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmaWxsPSJ3aGl0ZSI+PTwvdGV4dD48L3N2Zz4=",
+  calct: "imagens/calculosdatornearia.png",
+  camera: "imagens/camera.png",
+  canva: "imagens/canva.png",
+  chatgpt: "imagens/chatgpt.png",
+  chrome: "imagens/chromee.png",
+  cifra: "imagens/cifra.png",
+  clash: "imagens/clash.png",
+  carteira: "imagens/carteiragoogle.png",
+  cartgov: "imagens/carteira.png",
+  spotify: "imagens/spoti.png",
+  youtube: "imagens/youtube.png",
+  maps: "imagens/maps.png",
+  netflix: "imagens/netflix.png",
+  telegram: "imagens/telegram.png",
+  jogos: "imagens/steam.png",
+  files: "imagens/zarchiver.png"
+};
+
+const APPS = [
+  {id:"claude", uid:"claude", name:"Claude", claude:true, badge:0},
+  {id:"whatsapp", uid:"whatsapp", name:"WhatsApp", claude:false, badge:0},
+  {id:"instagram", uid:"instagram", name:"Instagram", claude:false, badge:0},
+  {id:"tiktok", uid:"tiktok", name:"TikTok", claude:false, badge:3},
+  {id:"acode", uid:"acode", name:"Acode", claude:false, badge:0},
+  {id:"agenda", uid:"agenda", name:"Agenda", claude:false, badge:0},
+  {id:"agora", uid:"agora", name:"Ágora", claude:false, badge:0},
+  {id:"aliexpress", uid:"aliexpress", name:"AliExpress", claude:false, badge:0},
+  {id:"amazonm", uid:"amazonm", name:"Amazon M...", claude:false, badge:0},
+  {id:"amazon", uid:"amazon", name:"Amazon Sh...", claude:false, badge:0},
+  {id:"appmall", uid:"appmall", name:"App Mall", claude:false, badge:0},
+  {id:"vault", uid:"vault", name:"App vault", claude:false, badge:0},
+  {id:"booking", uid:"booking", name:"Booking.com", claude:false, badge:0},
+  {id:"bradesco", uid:"bradesco", name:"Bradesco", claude:false, badge:0},
+  {id:"bussola", uid:"bussola", name:"Bússola", claude:false, badge:0},
+  {id:"calc", uid:"calc", name:"Calculadora", claude:false, badge:0},
+  {id:"calct", uid:"calct", name:"Cálculos da...", claude:false, badge:0},
+  {id:"camera", uid:"camera", name:"Câmera", claude:false, badge:0},
+  {id:"files",  uid:"files",   name:"Arquivos",  claude:false, badge:0},
+  {id:"canva", uid:"canva", name:"Canva", claude:false, badge:0},
+  {id:"carteira", uid:"carteira", name:"Carteira", claude:false, badge:0},
+  {id:"cartgov", uid:"cartgov", name:"Carteira de...", claude:false, badge:0},
+  {id:"jogos", uid:"jogos", name:"Centro de J...", claude:false, badge:0},
+  {id:"chatgpt", uid:"chatgpt", name:"ChatGPT", claude:false, badge:0},
+  {id:"chrome", uid:"chrome", name:"Chrome", claude:false, badge:0},
+  {id:"cifra", uid:"cifra", name:"Cifra Club", claude:false, badge:0},
+  {id:"clash", uid:"clash", name:"Clash Royale", claude:false, badge:0},
+  {id:"spotify", uid:"spotify", name:"Spotify", claude:false, badge:0},
+  {id:"youtube", uid:"youtube", name:"YouTube", claude:false, badge:0},
+  {id:"maps", uid:"maps", name:"Maps", claude:false, badge:0},
+  {id:"netflix", uid:"netflix", name:"Netflix", claude:false, badge:0},
+  {id:"telegram", uid:"telegram", name:"Telegram", claude:false, badge:0}
+];
+
+
+const customIcons = {};
+
+function buildGrid() {
+  const grid = document.getElementById('appGrid');
+  grid.innerHTML = '';
+
+  APPS.forEach(function(app) {
+    const item = document.createElement('div');
+    item.className = 'app-item';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'aico';
+    const src = customIcons[app.uid] || ICONS[app.id] || '';
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = '';
+    wrap.appendChild(img);
+
+    const nm = document.createElement('div');
+    nm.className = 'aname';
+    nm.textContent = app.name;
+
+    if (app.badge) {
+      const b = document.createElement('div');
+      b.className = 'badge';
+      b.textContent = app.badge;
+      item.appendChild(b);
+    }
+
+    item.appendChild(wrap);
+    item.appendChild(nm);
+    grid.appendChild(item);
+
+    item.addEventListener('click', function() {
+      if (app.claude) claudeTap();
+      // ── goHome: volta pra tela de bloqueio ao clicar no app ──
+      // Para mudar qual app faz isso, troque goHome:true no array APPS acima
+      if (app.goHome) goToLock();
+      // ── goFullscreen: entra em tela cheia ao clicar no app ──
+      // Para mudar qual app faz isso, troque goFullscreen:true no array APPS acima
+      if (app.goFullscreen) requestFS();
+    });
+
+
+  });
+
+  // Search bar as last scrollable item
+  var row = document.createElement('div');
+  row.className = 'search-row';
+  row.innerHTML = '<div class="home-search"><div class="search-ico">&#128269;</div><div class="search-txt">Pesquisar por apps</div></div>';
+  grid.appendChild(row);
+}
+
+buildGrid();
+
+// ── Dynamic Agenda icon: always shows today's date ──
+function updateAgendaIcon() {
+  var day = new Date().getDate();
+  var canvas = document.createElement('canvas');
+  canvas.width = 100; canvas.height = 100;
+  var ctx = canvas.getContext('2d');
+
+  // Rounded rect background
+  function roundRect(x,y,w,h,r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath();
+  }
+
+  // Outer card
+  roundRect(0,0,100,100,22);
+  ctx.fillStyle = 'white'; ctx.fill();
+
+  // Top blue band
+  roundRect(0,0,100,36,22);
+  ctx.fillStyle = '#1976D2'; ctx.fill();
+  // Cover bottom curve of top band
+  ctx.fillRect(0,22,100,14);
+
+  // Bottom white area
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0,36,100,64);
+  // Re-round bottom corners
+  roundRect(0,0,100,100,22);
+  ctx.fillStyle = 'white';
+  // clip trick: just redraw bottom half white
+  ctx.fillRect(0,36,100,64);
+
+  // Round bottom corners properly
+  ctx.beginPath();
+  ctx.moveTo(0,36);
+  ctx.lineTo(0,78); ctx.quadraticCurveTo(0,100,22,100);
+  ctx.lineTo(78,100); ctx.quadraticCurveTo(100,100,100,78);
+  ctx.lineTo(100,36);
+  ctx.closePath();
+  ctx.fillStyle='white'; ctx.fill();
+
+  // Month label (short, in Portuguese)
+  var months=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  var month = months[new Date().getMonth()];
+  ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.font='bold 13px Arial';
+  ctx.textAlign='center';
+  ctx.fillText(month, 50, 24);
+
+  // Day number
+  ctx.fillStyle='#1976D2';
+  ctx.font='bold 36px Arial';
+  ctx.textAlign='center';
+  ctx.fillText(String(day), 50, 80);
+
+  // Update all agenda icons in grid
+  var src = canvas.toDataURL('image/png');
+  ICONS.agenda = src;
+  document.querySelectorAll('#appGrid .app-item').forEach(function(item) {
+    var nm = item.querySelector('.aname');
+    if (nm && nm.textContent === 'Agenda') {
+      var img = item.querySelector('img');
+      if (img) img.src = src;
+    }
+  });
+}
+updateAgendaIcon();
+// Update at midnight
+(function schedMidnight() {
+  var now = new Date();
+  var msToMidnight = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1) - now;
+  setTimeout(function() { updateAgendaIcon(); schedMidnight(); }, msToMidnight);
+})();
+
+// Set notification icon
+document.getElementById('pcIcon').src = ICONS.claude;
+
+// Clock
+function tick() {
+  var n = new Date();
+  var t = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  var days = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  var months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('sbTime').textContent = t;
+  document.getElementById('lockTime').textContent = t;
+  document.getElementById('lockDate').textContent = days[n.getDay()] + ', ' + n.getDate() + ' de ' + months[n.getMonth()];
+  document.getElementById('pcTime').textContent = t;
+}
+tick();
+setInterval(tick, 15000);
+
+// Fullscreen
+function requestFS() {
+  var el = document.documentElement;
+  var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (req) req.call(el);
+}
+function updateFSClass() {
+  var inFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+  document.body.classList.toggle('is-fullscreen', inFS);
+}
+document.addEventListener('fullscreenchange', updateFSClass);
+document.addEventListener('webkitfullscreenchange', updateFSClass);
+document.addEventListener('mozfullscreenchange', updateFSClass);
+document.addEventListener('touchstart', function fsOnce() {
+  requestFS();
+  document.removeEventListener('touchstart', fsOnce);
+}, {once:true});
+
+// Screens
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+    s.classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id).classList.add('active');
+}
+function goToPin()  { pin=''; dots(); err(''); show('pinScreen'); }
+function goToLock() { pin=''; dots(); err(''); show('lockScreen'); }
+
+// PIN
+var pin='', attempt=0, savedPin=null, locked=false, dismissTimer=null;
+function dots() {
+  for (var i=0;i<4;i++) {
+    var d = document.getElementById('d'+i);
+    d.classList.remove('filled','error');
+    if (i < pin.length) d.classList.add('filled');
+  }
+}
+function errDots() {
+  for (var i=0;i<4;i++) {
+    var d = document.getElementById('d'+i);
+    d.classList.remove('filled');
+    d.classList.add('error');
+  }
+}
+function err(m) { document.getElementById('pinErr').textContent = m; }
+function np(e, digit) {
+  if (locked || pin.length >= 4) return;
+  pin += digit; dots();
+  if (pin.length === 4) setTimeout(handle, 130);
+}
+function del() {
+  if (locked) return;
+  pin = pin.slice(0,-1); dots(); err('');
+  for (var i=0;i<4;i++) document.getElementById('d'+i).classList.remove('error');
+}
+function handle() {
+  locked = true;
+  if (attempt===0 || attempt===1) { fail(); return; }
+  if (attempt===2) { savedPin = pin; fail(); return; }
+  unlock();
+}
+function fail() {
+  attempt++;
+  errDots();
+  var w = document.getElementById('pinDots');
+  w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
+  var msgs = ['Senha incorreta. Tente novamente.','Senha incorreta. Tente novamente.','Senha incorreta. Mais uma tentativa disponível.'];
+  err(msgs[attempt-1] || 'Senha incorreta.');
+  setTimeout(function() { pin=''; dots(); locked=false; }, 950);
+}
+function unlock() {
+  attempt=0; locked=false; pin=''; dots(); err('');
+  show('homeScreen');
+}
+function claudeTap() {
+  if (!savedPin) return;
+  document.getElementById('pcVal').textContent = savedPin;
+  showCard();
+}
+function showCard() {
+  var card = document.getElementById('pinCard');
+  card.classList.remove('show');
+  var p = document.getElementById('pcProgress');
+  p.style.animation = 'none'; void p.offsetWidth; p.style.animation = '';
+  void card.offsetWidth;
+  card.classList.add('show');
+  clearTimeout(dismissTimer);
+  dismissTimer = setTimeout(hideCard, 4000);
+}
+function hideCard() {
+  clearTimeout(dismissTimer);
+  document.getElementById('pinCard').classList.remove('show');
+}
+</script>
+</body>
+</html>
